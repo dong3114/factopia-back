@@ -39,39 +39,41 @@ public class JwtUtil {
 
     /**
      * JWT에서 권한 등급으로 추출
-     * @param token
-     * @return 권한레벨
      */
     public int extractLevel(String token){
-        try{
-            Claims claims = Jwts.parser()
-                    .setSigningKey(jwtToken.getSecret())
-                    .parseClaimsJws(token.replace("Bearer", ""))
-                    .getBody();
-            return claims.get("level", Integer.class);
-        } catch (ExpiredJwtException e){
-            throw new RuntimeException("JWT가 만료되었습니다.", e);
-        } catch (SignatureException e){
-            throw new RuntimeException("JWT 서명이 유효하지 않습니다.", e);
+        return getClaims(token).get("level", Integer.class);
+    }
+
+    /**
+     * JWT에서 회원코드 추출
+     */
+    public String extractMemberNo(String token){
+        return getClaims(token).getSubject();
+    }
+
+    /**
+     * 토큰의 유효성 검사
+     * @param token
+     * @return
+     */
+    public boolean vaildateToken(String token){
+        try {
+            getClaims(token);
+            return true;
         } catch (Exception e){
-            throw new RuntimeException("JWT가 유효하지 않습니다.", e);
+            throw new SecurityException("토큰 검증 실패", e);
         }
     }
 
-    public String extractMemberNo(String token){
-        try{
-            Claims claims = Jwts.parser()
-                    .setSigningKey(jwtToken.getSecret())
-                    .parseClaimsJws(token.replace("Bearer", ""))
-                    .getBody();
-
-            return claims.getSubject();
-        } catch (ExpiredJwtException e){
-            throw new RuntimeException("JWT가 만료되었습니다.", e);
-        } catch (SignatureException e){
-            throw new RuntimeException("JWT 서명이 유효하지 않습니다.", e);
-        } catch (Exception e){
-            throw new RuntimeException("JWT가 유효하지 않습니다.", e);
-        }
+    /**
+     * 토큰 파싱 공통 메서드
+     * @param token 
+     * @return 토큰 파싱 데이터
+     */
+    private Claims getClaims(String token){
+        return Jwts.parser()
+                .setSigningKey(jwtToken.getSecret())
+                .parseClaimsJws(token.replace("Bearer", ""))
+                .getBody();
     }
 }

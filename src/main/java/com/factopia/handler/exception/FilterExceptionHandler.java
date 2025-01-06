@@ -35,4 +35,15 @@ public class FilterExceptionHandler extends BaseExceptionHandler {
     {
         createJsonErrorResponse(response, HttpStatus.OK, "데이터가 null 입니다.", message);
     }
+
+    /**
+     * 사용자가 직접 호출할 수 있는 static 메서드
+     */
+    public static void handleException(HttpServletResponse response,
+                                       HttpStatus status,
+                                       String message,
+                                       String detail) throws IOException
+    {
+        new FilterExceptionHandler().createJsonErrorResponse(response, status, message, detail);
+    }
 }

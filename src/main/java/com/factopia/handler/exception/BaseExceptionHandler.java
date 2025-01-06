@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -29,7 +27,6 @@ public abstract class BaseExceptionHandler
         return new ResponseEntity<>(errorResponse, status);
     }
 
-
     protected void createJsonErrorResponse
             (HttpServletResponse response, HttpStatus status, String message, String detail) throws IOException
     {
@@ -41,7 +38,7 @@ public abstract class BaseExceptionHandler
 
         // JSON 변환 및 로그 출력
         String jsonResponse = objectMapper.writeValueAsString(errorResponse.toString());
-        logger.warning(jsonResponse);
+        logger.warning("에러 발생" + jsonResponse);
 
         // HTTP 응답 설정
         response.setStatus(status.value());
