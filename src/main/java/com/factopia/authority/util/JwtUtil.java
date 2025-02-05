@@ -2,11 +2,8 @@ package com.factopia.authority.util;
 
 import com.factopia.authority.domain.JwtToken;
 import com.factopia.dbenum.Role;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -16,6 +13,7 @@ public class JwtUtil {
 
     private final JwtToken jwtToken;
 
+    @Autowired
     public JwtUtil(JwtToken jwtToken) {
         this.jwtToken = jwtToken;
     }
@@ -38,40 +36,58 @@ public class JwtUtil {
     }
 
     /**
-     * JWT에서 권한 등급으로 추출
-     * @param token
-     * @return 권한레벨
+     * 토큰의 유효성 검사
      */
-    public int extractLevel(String token){
-        try{
-            Claims claims = Jwts.parser()
-                    .setSigningKey(jwtToken.getSecret())
-                    .parseClaimsJws(token.replace("Bearer", ""))
-                    .getBody();
-            return claims.get("level", Integer.class);
-        } catch (ExpiredJwtException e){
-            throw new RuntimeException("JWT가 만료되었습니다.", e);
-        } catch (SignatureException e){
-            throw new RuntimeException("JWT 서명이 유효하지 않습니다.", e);
-        } catch (Exception e){
-            throw new RuntimeException("JWT가 유효하지 않습니다.", e);
+    public boolean validateToken(String token) {
+        try {
+            getClaims(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            System.out.println("JWT 만료됨: " + e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            System.out.println("지원되지 않는 JWT: " + e.getMessage());
+        } catch (MalformedJwtException e) {
+            System.out.println("JWT 형식 오류: " + e.getMessage());
+        } catch (SignatureException e) {
+            System.out.println("JWT 서명 오류: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println("JWT 잘못된 인자: " + e.getMessage());
         }
+        return false;
     }
 
-    public String extractMemberNo(String token){
-        try{
-            Claims claims = Jwts.parser()
-                    .setSigningKey(jwtToken.getSecret())
-                    .parseClaimsJws(token.replace("Bearer", ""))
-                    .getBody();
+    /**
+     * 토큰이 Bearer 형식을 따르는지 검사
+     * @param token 토큰의 헤더
+     * @return 헤더의 유효성 여부
+     */
+    public boolean hasValidHeader(String token){
+        return token != null && token.startsWith("Bearer ") && token.length() > 7;
+    }
 
-            return claims.getSubject();
-        } catch (ExpiredJwtException e){
-            throw new RuntimeException("JWT가 만료되었습니다.", e);
-        } catch (SignatureException e){
-            throw new RuntimeException("JWT 서명이 유효하지 않습니다.", e);
-        } catch (Exception e){
-            throw new RuntimeException("JWT가 유효하지 않습니다.", e);
-        }
+    /**
+     * JWT에서 권한 등급으로 추출
+     */
+    public int extractLevel(String token){
+        return getClaims(token).get("level", Integer.class);
+    }
+
+    /**
+     * JWT에서 회원코드 추출
+     */
+    public String extractMemberNo(String token){
+        return getClaims(token).getSubject();
+    }
+
+    /**
+     * 토큰 파싱 공통 메서드
+     * @param token 
+     * @return 토큰 파싱 데이터
+     */
+    private Claims getClaims(String token){
+        return Jwts.parser()
+                .setSigningKey(jwtToken.getSecret())
+                .parseClaimsJws(token.replace("Bearer", ""))
+                .getBody();
     }
 }

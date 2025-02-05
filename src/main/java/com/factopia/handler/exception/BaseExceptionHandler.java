@@ -3,17 +3,17 @@ package com.factopia.handler.exception;
 import com.factopia.handler.domain.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
  * 에러 객체 반환 (기본 형태)
  */
+@Slf4j
 public abstract class BaseExceptionHandler
 {
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -26,9 +26,10 @@ public abstract class BaseExceptionHandler
                 .message(message)
                 .path(path)
                 .build();
+        log.error("🚨 [예외 발생] 상태코드: {}, 메시지: {}, 경로: {}", status.value(), message, path);
+
         return new ResponseEntity<>(errorResponse, status);
     }
-
 
     protected void createJsonErrorResponse
             (HttpServletResponse response, HttpStatus status, String message, String detail) throws IOException
@@ -41,7 +42,7 @@ public abstract class BaseExceptionHandler
 
         // JSON 변환 및 로그 출력
         String jsonResponse = objectMapper.writeValueAsString(errorResponse.toString());
-        logger.warning(jsonResponse);
+        logger.warning("에러 발생" + jsonResponse);
 
         // HTTP 응답 설정
         response.setStatus(status.value());

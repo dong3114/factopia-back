@@ -1,0 +1,32 @@
+<configuration>
+
+    <!-- 로그 패턴 설정 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 기본 로그 레벨 설정 (ERROR 이상만 출력) -->
+    <root level="ERROR">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <!-- Spring Security 로그 레벨 조정 -->
+    <logger name="org.springframework.security" level="INFO"/>
+
+    <!-- HikariCP 관련 로그 최소화 -->
+    <logger name="com.zaxxer.hikari" level="WARN"/>
+    <logger name="com.zaxxer.hikari.HikariDataSource" level="WARN"/>
+    <logger name="com.zaxxer.hikari.pool.HikariPool" level="WARN"/>
+
+    <!-- log4jdbc 불필요한 로그 최소화 -->
+    <logger name="jdbc" level="ERROR"/>
+    <logger name="jdbc.sqlonly" level="ERROR"/>
+    <logger name="jdbc.sqltiming" level="ERROR"/>
+    <logger name="jdbc.audit" level="ERROR"/>
+    <logger name="jdbc.resultset" level="ERROR"/>
+    <logger name="jdbc.resultsettable" level="ERROR"/>
+    <logger name="jdbc.connection" level="ERROR"/>
+
+</configuration>
