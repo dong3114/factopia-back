@@ -1,12 +1,10 @@
 package com.factopia.authority.util;
 
 import com.factopia.handler.exception.FilterExceptionHandler;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +16,6 @@ import java.util.Collections;
 
 @Component
 public class JwtAuthenticationFiler extends OncePerRequestFilter {
-    @Autowired
     private final JwtUtil jwtUtil;
     private final FilterExceptionHandler filterExceptionHandler;
 
@@ -39,25 +36,56 @@ public class JwtAuthenticationFiler extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String authorizetionHeader = request.getHeader("Authorization");
+        System.out.println("🛠 [JwtAuthenticationFilter] 요청 시작: " + request.getMethod() + " " + request.getRequestURI());
 
-        // 토큰이 유무 체크, 형식 체크
+        String requestURI = request.getRequestURI();
+        String method = request.getMethod();
 
-
-        // 유효성 검증
-        if(!jwtUtil.vaildateToken(authorizetionHeader)){
-            filterExceptionHandler.handleAuthenticationFailure(response, "인증 실패");
+        // ✅ OPTIONS 요청이면 필터를 통과시킴 (CORS 해결)
+        if (method.equalsIgnoreCase("OPTIONS")) {
+            System.out.println("🛠 [JwtAuthenticationFilter] OPTIONS 요청 필터 통과");
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        if(authorizetionHeader == null && !authorizetionHeader.startsWith("Bearer ")){
+        String authorizationHeader = request.getHeader("Authorization");
+
+        // ✅ 인증이 필요 없는 요청이면 필터 통과
+        if (requestURI.startsWith("/api/register") || requestURI.startsWith("/api/auth")) {
+            System.out.println("🛠 [JwtAuthenticationFilter] 인증 예외 경로 접근: " + requestURI);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (authorizationHeader == null) {
+            System.out.println("🚨 [JwtAuthenticationFilter] 인증 실패 - Authorization 헤더 없음");
+        } else {
+            System.out.println("🔎 [JwtAuthenticationFilter] Authorization 헤더 확인: " + authorizationHeader);
+        }
+
+        // 🔹 헤더 검사
+        if (authorizationHeader == null || !jwtUtil.hasValidHeader(authorizationHeader)) {
+            System.out.println("🚨 [JwtAuthenticationFilter] 인증 실패 - 유효하지 않은 헤더");
             filterExceptionHandler.handleAuthenticationFailure(response, "토큰이 없거나 Bearer 타입이 아닙니다.");
             return;
         }
 
+        String token = authorizationHeader.replace("Bearer", "");
+        System.out.println("🔎 [JwtAuthenticationFilter] 토큰 추출 완료: " + token);
 
+        // 2. 유효성 검증
+        if(!jwtUtil.validateToken(token)){
+            System.out.println("🚨 [JwtAuthenticationFilter] 인증 실패 - 잘못된 토큰");
+            filterExceptionHandler.handleAuthenticationFailure(response, "인증 실패");
+            return;
+        }
 
-        int level = jwtUtil.extractLevel(authorizetionHeader);
-        String memberNo = jwtUtil.extractMemberNo(authorizetionHeader);
+        int level = jwtUtil.extractLevel(token);
+        String memberNo = jwtUtil.extractMemberNo(token);
+
+        System.out.println("✅ [JwtAuthenticationFilter] 인증 성공 - 사용자: " + memberNo + " / Level: " + level);
+
+        // 3. 인증 객체 설정 및 정보 추출
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
                         memberNo,

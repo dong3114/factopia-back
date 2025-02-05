@@ -16,5 +16,5 @@ public class Member {
     final String memberEmail;
     final int memberAuthority;
     final int memberRank;
-    final String memberEnterprise;
+    final String enterpriseNo;
 }

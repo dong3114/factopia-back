@@ -2,11 +2,8 @@ package com.factopia.authority.util;
 
 import com.factopia.authority.domain.JwtToken;
 import com.factopia.dbenum.Role;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -16,6 +13,7 @@ public class JwtUtil {
 
     private final JwtToken jwtToken;
 
+    @Autowired
     public JwtUtil(JwtToken jwtToken) {
         this.jwtToken = jwtToken;
     }
@@ -38,6 +36,36 @@ public class JwtUtil {
     }
 
     /**
+     * 토큰의 유효성 검사
+     */
+    public boolean validateToken(String token) {
+        try {
+            getClaims(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            System.out.println("JWT 만료됨: " + e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            System.out.println("지원되지 않는 JWT: " + e.getMessage());
+        } catch (MalformedJwtException e) {
+            System.out.println("JWT 형식 오류: " + e.getMessage());
+        } catch (SignatureException e) {
+            System.out.println("JWT 서명 오류: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println("JWT 잘못된 인자: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * 토큰이 Bearer 형식을 따르는지 검사
+     * @param token 토큰의 헤더
+     * @return 헤더의 유효성 여부
+     */
+    public boolean hasValidHeader(String token){
+        return token != null && token.startsWith("Bearer ") && token.length() > 7;
+    }
+
+    /**
      * JWT에서 권한 등급으로 추출
      */
     public int extractLevel(String token){
@@ -49,20 +77,6 @@ public class JwtUtil {
      */
     public String extractMemberNo(String token){
         return getClaims(token).getSubject();
-    }
-
-    /**
-     * 토큰의 유효성 검사
-     * @param token
-     * @return
-     */
-    public boolean vaildateToken(String token){
-        try {
-            getClaims(token);
-            return true;
-        } catch (Exception e){
-            throw new SecurityException("토큰 검증 실패", e);
-        }
     }
 
     /**
