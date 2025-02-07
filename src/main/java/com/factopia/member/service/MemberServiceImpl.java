@@ -26,6 +26,8 @@ public class MemberServiceImpl implements MemberService{
 
     // 필수 입력값 검증
     private void requestVaild(Member member){
+        System.out.println("서비스: requestVaild");
+
         if(member.getMemberId() == null ||
            member.getMemberPw() == null ||
            member.getMemberName() == null ||
@@ -48,26 +50,26 @@ public class MemberServiceImpl implements MemberService{
     // 아이디 유효성 검증
     @Override
     public boolean validateId(String memberId){
-        System.out.println("아이디 유효성확인 서비스로직 실행");
         int count = memberMapper.validateId(memberId);
-        System.out.println("카운트" + count);
         return memberMapper.validateId(memberId) == 0;
     }
 
     // 이메일 유효성 검증
     @Override
     public boolean validateEmail(String memberEmail){
-        return !memberMapper.checkMemberEmail(memberEmail);
+        return memberMapper.checkMemberEmail(memberEmail) == 0;
     }
 
     // 휴대폰 유효성 검증
     @Override
     public boolean validatePhone(String memberPhone){
-        return !memberMapper.checkMemberPhone(memberPhone);
+        return memberMapper.checkMemberPhone(memberPhone) == 0;
     }
 
     // 중복 검사 로직
     private void validateMember(Member member){
+        System.out.println("서비스: validateMember");
+
         if(!validateId(member.getMemberId())){
             throw new IllegalStateException("이미 사용 중인 아이디입니다.");
         }

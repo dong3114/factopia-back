@@ -17,7 +17,7 @@
     <!-- Create -->
     <insert id="insertMember" parameterType="com.factopia.member.domain.Member" useGeneratedKeys="true" keyProperty="memberNo">
         <selectKey resultType="String" keyProperty="memberNo" order="BEFORE">
-            SELECT CONCAT('M', LPAD(IFNULL(MAX(SUBSTRING(m_no, 2)), 0) + 1, 6, '0')) FROM member_table
+            SELECT CONCAT('M', LPAD(IFNULL(MAX(SUBSTRING(m_no, 2)), 0) + 1, 6, '0')) FROM member
         </selectKey>
         INSERT INTO member (m_no, m_id, m_pw, m_name, m_phone, m_email, m_authority, m_rank_no, e_no)
         VALUES (#{memberNo}, #{memberId}, #{memberPw}, #{memberName}, #{memberPhone}, #{memberEmail}, NULL, NULL, NULL)
@@ -26,6 +26,16 @@
     <!-- 아이디 중복 검사 -->
     <select id="validateId" resultType="int">
         SELECT COUNT(*) FROM member WHERE m_id = #{memberId}
+    </select>
+
+    <!-- 핸드폰번호체크 -->
+    <select id="checkMemberPhone" resultType="int">
+        SELECT COUNT(*) FROM member WHERE m_phone = #{memberPhone}
+    </select>
+
+    <!-- 이메일체크 -->
+    <select id="checkMemberEmail" resultType="int">
+        SELECT COUNT(*) FROM member WHERE m_email = #{memberEmail}
     </select>
 
 </mapper>

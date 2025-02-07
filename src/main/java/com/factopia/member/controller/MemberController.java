@@ -22,6 +22,15 @@ public class MemberController {
 
     @PostMapping("/request")
     public ResponseEntity<Map<String, Object>> insertMember(@RequestBody Member member){
+        System.out.println("📌 회원 등록 정보");
+        System.out.println("ID: " + member.getMemberId());
+        System.out.println("PW: " + member.getMemberPw());
+        System.out.println("이름: " + member.getMemberName());
+        System.out.println("이메일: " + member.getMemberEmail());
+        System.out.println("전화번호: " + member.getMemberPhone());
+
+        System.out.println("memberId: " + member.getMemberId());
+
         // 1. 필수 값 누락 검증
         validateRequiredFields(member);
         // 성공 1, 실패 0
@@ -91,9 +100,10 @@ public class MemberController {
         if (member.getMemberId() == null ||
                 member.getMemberPw() == null ||
                 member.getMemberName() == null ||
-                member.getMemberPhone() == null ||
                 member.getMemberEmail() == null ||
-                member.getEnterpriseNo() == null) {
+                member.getMemberPhone() == null
+
+                ) {
             throw new IllegalArgumentException("회원가입 필수 정보 누락");
         }
     }
