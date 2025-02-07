@@ -1,20 +1,18 @@
 package com.factopia.member.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Value;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
-@Value
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor(force = true)
 @Builder
 public class Member {
-    final String memberNo;
-    final String memberId;
-    final String memberPw;
-    final String memberName;
-    final String memberPhone;
-    final String memberEmail;
-    final int memberAuthority;
-    final int memberRank;
-    final String enterpriseNo;
+    private String memberNo;
+    private String memberId;
+    private String memberPw;
+    private String memberName;
+    private String memberPhone;
+    private String memberEmail;
 }

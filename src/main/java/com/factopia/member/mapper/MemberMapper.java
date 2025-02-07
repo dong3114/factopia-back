@@ -24,7 +24,7 @@ public interface MemberMapper {
      * 회원가입 유효성검증
      */
     int validateId(@Param("memberId")String memberId);
-    boolean checkMemberPhone(@Param("memberPhone")String memberPhone);
-    boolean checkMemberEmail(@Param("memberEmail")String memberEmail);
+    int checkMemberPhone(@Param("memberPhone")String memberPhone);
+    int checkMemberEmail(@Param("memberEmail")String memberEmail);
 }
 
