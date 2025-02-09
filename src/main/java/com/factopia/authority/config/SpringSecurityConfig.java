@@ -37,7 +37,10 @@ public class SpringSecurityConfig {
                             "/actuator/health",
                             "/actuator/info",
                             "/api/auth/**",
-                            "/api/register/**"
+                            "/api/register/**",
+                            // 추후 삭제
+                            "/api/factory/**"
+
                     ).permitAll();
 
                     // 🔒 그 외 모든 요청은 인증 필요
