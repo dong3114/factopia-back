@@ -1,10 +1,12 @@
 package com.factopia.member.controller;
 
+import com.factopia.authority.domain.GenrateJwtToken;
+import com.factopia.authority.domain.JwtToken;
 import com.factopia.authority.util.JwtUtil;
+import com.factopia.member.domain.Login;
 import com.factopia.member.domain.Member;
 import com.factopia.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/register")
+@RequestMapping("/api/member")
 @CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class MemberController {
@@ -20,7 +22,19 @@ public class MemberController {
     private final MemberService memberService;
     private final JwtUtil jwtUtil;
 
-    @PostMapping("/request")
+    /**
+     * 로그인
+     * @param loginRequest 로그인 input (id,pw)객체
+     * @return m_no, e_no
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Login loginRequest){
+        String token = memberService.login(loginRequest);
+        return ResponseEntity.ok(new GenrateJwtToken(token));
+    }
+
+
+    @PostMapping("/register/request")
     public ResponseEntity<Map<String, Object>> insertMember(@RequestBody Member member){
         System.out.println("📌 회원 등록 정보");
         System.out.println("ID: " + member.getMemberId());
@@ -44,7 +58,7 @@ public class MemberController {
         }
     }
 
-    @PutMapping("/validate/id")
+    @PutMapping("/register/validate/id")
     public ResponseEntity<Map<String, Object>> validateId(@RequestParam String memberId){
         System.out.println("아이디 유효성검증: " + memberId) ;
         Map<String, Object> result = new HashMap<>();
@@ -63,7 +77,7 @@ public class MemberController {
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/validate/email")
+    @PutMapping("/register/validate/email")
     public ResponseEntity<Map<String, Object>> validateEmail(@RequestParam String memberEmail){
         Map<String, Object> result = new HashMap<>();
 
@@ -79,7 +93,7 @@ public class MemberController {
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/validate/phone")
+    @PutMapping("/register/validate/phone")
     public ResponseEntity<Map<String, Object>> validatePhone(@RequestParam String memberPhone){
         Map<String, Object> result = new HashMap<>();
 

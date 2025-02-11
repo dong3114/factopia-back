@@ -1,8 +1,11 @@
 package com.factopia.member.mapper;
 
+import com.factopia.member.domain.Login;
 import com.factopia.member.domain.Member;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.Map;
 
 @Mapper
 public interface MemberMapper {
@@ -14,11 +17,11 @@ public interface MemberMapper {
     int insertMember(Member member);
 
     /**
-     * 회원 번호로 회원 조회
-     * @param memberNo 회원 번호
-     * @return 회원 정보
+     * 로그인
      */
-    Member findMemberNo(@Param("memberNo") String memberNo);
+    Member login(@Param("inputMemberId") String memberId, @Param("inputMemberPw") String memberPw);
+    Member getMemberInfo(@Param("memberNo") String memberNo);
+
 
     /**
      * 회원가입 유효성검증

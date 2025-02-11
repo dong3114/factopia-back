@@ -24,9 +24,10 @@ public class JwtUtil {
      * @param role 열거형 권한 정보
      * @return
      */
-    public String generateToken(String memberNo, Role role){
+    public String generateToken(String memberNo, Role role, String enterpriseNo){
         return Jwts.builder()
                 .setSubject(memberNo)
+                .claim("e_no", enterpriseNo)
                 .claim("level", role.getLevel())
                 .setIssuer(jwtToken.getIssuer())
                 .setIssuedAt(new Date())

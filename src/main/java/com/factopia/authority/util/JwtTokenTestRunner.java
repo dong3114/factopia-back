@@ -15,7 +15,6 @@ public class JwtTokenTestRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("JWT Secret: " + jwtToken.getSecret());
         System.out.println("JWT Expiration: " + jwtToken.getExpiration());
         System.out.println("JWT Issuer: " + jwtToken.getIssuer());
         System.out.println("JWT Token Prefix: " + jwtToken.getTokenPrefix());

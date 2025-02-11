@@ -1,5 +1,6 @@
 package com.factopia.authority.util;
 
+import com.factopia.authority.config.SpringSecurityConfig;
 import com.factopia.handler.exception.FilterExceptionHandler;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFiler extends OncePerRequestFilter {
@@ -44,14 +46,15 @@ public class JwtAuthenticationFiler extends OncePerRequestFilter {
         // ✅ OPTIONS 요청이면 필터를 통과시킴 (CORS 해결)
         if (method.equalsIgnoreCase("OPTIONS")) {
             System.out.println("🛠 [JwtAuthenticationFilter] OPTIONS 요청 필터 통과");
-            filterChain.doFilter(request, response);
+            response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
 
         String authorizationHeader = request.getHeader("Authorization");
+        List<String> authWhiteList = SpringSecurityConfig.getAuthWhiteList();
 
         // ✅ 인증이 필요 없는 요청이면 필터 통과
-        if (requestURI.startsWith("/api/register") || requestURI.startsWith("/api/auth")) {
+        if (authWhiteList.stream().anyMatch(pattern -> requestURI.matches(pattern.replace("**", ".*")))) {
             System.out.println("🛠 [JwtAuthenticationFilter] 인증 예외 경로 접근: " + requestURI);
             filterChain.doFilter(request, response);
             return;

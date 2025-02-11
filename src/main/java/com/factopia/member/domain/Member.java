@@ -15,4 +15,6 @@ public class Member {
     private String memberName;
     private String memberPhone;
     private String memberEmail;
+    private int memberRank;
+    private String enterpriseNo;
 }

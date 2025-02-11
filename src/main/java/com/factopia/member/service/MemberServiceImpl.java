@@ -1,17 +1,19 @@
 package com.factopia.member.service;
 
+import com.factopia.authority.util.JwtUtil;
+import com.factopia.dbenum.Role;
+import com.factopia.member.domain.Login;
 import com.factopia.member.domain.Member;
 import com.factopia.member.mapper.MemberMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService{
     private final MemberMapper memberMapper;
-
-    public MemberServiceImpl(MemberMapper memberMapper){
-        this.memberMapper = memberMapper;
-    }
+    private final JwtUtil jwtUtil;
 
     @Transactional
     @Override
@@ -39,12 +41,18 @@ public class MemberServiceImpl implements MemberService{
 
     // 회원코드를 통해 회원 정보 취득
     @Override
-    public Member getMemberNo(String memberNo){
-        Member member = memberMapper.findMemberNo(memberNo);
+    public String login(Login loginRequset){
+        Member member = memberMapper.login(loginRequset.getInputMemberId(), loginRequset.getInputMemberPw());
+
         if(member == null){
-            throw new IllegalArgumentException("해당 회원 정보가 없습니다.");
+            throw new IllegalArgumentException("아이디 또는 비밀번호 확인해주세요.");
         }
-        return member;
+
+        String memberNo = member.getMemberNo();
+        Role role = Role.fromLevel(member.getMemberRank());
+        String enterpriseNo = member.getEnterpriseNo();
+
+        return jwtUtil.generateToken(memberNo, role, enterpriseNo);
     }
 
     // 아이디 유효성 검증
