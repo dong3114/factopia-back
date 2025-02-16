@@ -32,7 +32,8 @@ public class SpringSecurityConfig {
             "/actuator/info",
             "/api/auth/**",
             "/api/member/register/**",
-            "/api/factory/**"
+            "/api/factory/**",
+            "/api/member/login"
     );
 
     @Bean

@@ -1,7 +1,6 @@
 package com.factopia.member.controller;
 
-import com.factopia.authority.domain.GenrateJwtToken;
-import com.factopia.authority.domain.JwtToken;
+import com.factopia.authority.domain.GenerateJwtToken;
 import com.factopia.authority.util.JwtUtil;
 import com.factopia.member.domain.Login;
 import com.factopia.member.domain.Member;
@@ -29,10 +28,12 @@ public class MemberController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Login loginRequest){
-        String token = memberService.login(loginRequest);
-        return ResponseEntity.ok(new GenrateJwtToken(token));
-    }
+        System.out.println("[컨트롤러] 로그인시작: " + loginRequest.getInputMemberId());
+        System.out.println("[컨트롤러] 로그인시작: " + loginRequest.getInputMemberPw());
+        GenerateJwtToken tokenResponse = memberService.login(loginRequest);
 
+        return ResponseEntity.ok(tokenResponse);
+    }
 
     @PostMapping("/register/request")
     public ResponseEntity<Map<String, Object>> insertMember(@RequestBody Member member){

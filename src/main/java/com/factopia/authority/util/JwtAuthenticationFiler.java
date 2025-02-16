@@ -1,6 +1,7 @@
 package com.factopia.authority.util;
 
 import com.factopia.authority.config.SpringSecurityConfig;
+import com.factopia.dbenum.Role;
 import com.factopia.handler.exception.FilterExceptionHandler;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -83,7 +84,7 @@ public class JwtAuthenticationFiler extends OncePerRequestFilter {
             return;
         }
 
-        int level = jwtUtil.extractLevel(token);
+        Role level = jwtUtil.extractLevel(token);
         String memberNo = jwtUtil.extractMemberNo(token);
 
         System.out.println("✅ [JwtAuthenticationFilter] 인증 성공 - 사용자: " + memberNo + " / Level: " + level);

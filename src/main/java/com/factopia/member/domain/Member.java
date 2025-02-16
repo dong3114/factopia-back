@@ -1,6 +1,5 @@
 package com.factopia.member.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 @Getter
@@ -16,5 +15,7 @@ public class Member {
     private String memberPhone;
     private String memberEmail;
     private int memberRank;
+    private int memberAuthority;
     private String enterpriseNo;
+
 }

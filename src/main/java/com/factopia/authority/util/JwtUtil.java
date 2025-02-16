@@ -37,6 +37,32 @@ public class JwtUtil {
     }
 
     /**
+     * ✅ JWT 갱신 (토큰 만료시간 연장)
+     */
+    public String refreshToken(String oldToken) {
+        if(!validateToken(oldToken)) {
+            throw new RuntimeException("토큰이 유효하지 않습니다.");
+        }
+
+        String memberNo = extractMemberNo(oldToken);
+        String enterpriseNo = extractEnterpriseNo(oldToken);
+        Role role = extractLevel(oldToken);
+
+        return generateToken(memberNo, role, enterpriseNo);
+    }
+
+    /**
+     * ✅ JWT 검증 및 만료 확인
+     */
+    public boolean isTokenExpired(String token) {
+        try {
+            return getClaims(token).getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
+    }
+
+    /**
      * 토큰의 유효성 검사
      */
     public boolean validateToken(String token) {
@@ -69,8 +95,9 @@ public class JwtUtil {
     /**
      * JWT에서 권한 등급으로 추출
      */
-    public int extractLevel(String token){
-        return getClaims(token).get("level", Integer.class);
+    public Role extractLevel(String token){
+        Role role = Role.fromLevel(getClaims(token).get("level", Integer.class));
+        return role;
     }
 
     /**
@@ -78,6 +105,17 @@ public class JwtUtil {
      */
     public String extractMemberNo(String token){
         return getClaims(token).getSubject();
+    }
+
+    public String extractEnterpriseNo(String token){
+        return getClaims(token).get("e_no", String.class);
+    }
+
+    /**
+     * 토큰 만료 시간 반환
+     */
+    public long getExpirationTime() {
+        return jwtToken.getExpiration();
     }
 
     /**

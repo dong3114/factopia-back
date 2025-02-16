@@ -19,7 +19,7 @@ public interface MemberMapper {
     /**
      * 로그인
      */
-    Member login(@Param("inputMemberId") String memberId, @Param("inputMemberPw") String memberPw);
+    Member login(@Param("memberId") String memberId, @Param("memberPw") String memberPw);
     Member getMemberInfo(@Param("memberNo") String memberNo);
 
 

@@ -1,5 +1,6 @@
 package com.factopia.member.service;
 
+import com.factopia.authority.domain.GenerateJwtToken;
 import com.factopia.authority.util.JwtUtil;
 import com.factopia.dbenum.Role;
 import com.factopia.member.domain.Login;
@@ -41,18 +42,24 @@ public class MemberServiceImpl implements MemberService{
 
     // 회원코드를 통해 회원 정보 취득
     @Override
-    public String login(Login loginRequset){
+    public GenerateJwtToken login(Login loginRequset){
+        System.out.println("[서비스] 아이디: " + loginRequset.getInputMemberId());
+        System.out.println("[서비스] 비밀번호: " + loginRequset.getInputMemberPw());
         Member member = memberMapper.login(loginRequset.getInputMemberId(), loginRequset.getInputMemberPw());
 
         if(member == null){
+            System.out.println("🚨 [서비스] 로그인 실패: 해당 아이디 또는 비밀번호 없음");
             throw new IllegalArgumentException("아이디 또는 비밀번호 확인해주세요.");
         }
 
         String memberNo = member.getMemberNo();
         Role role = Role.fromLevel(member.getMemberRank());
         String enterpriseNo = member.getEnterpriseNo();
+        long expires = System.currentTimeMillis() + jwtUtil.getExpirationTime();
 
-        return jwtUtil.generateToken(memberNo, role, enterpriseNo);
+        String token = jwtUtil.generateToken(memberNo, role, enterpriseNo);
+
+        return new GenerateJwtToken(token, memberNo, enterpriseNo, expires);
     }
 
     // 아이디 유효성 검증

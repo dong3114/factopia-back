@@ -10,8 +10,8 @@
         <result property="memberName" column="m_name"/>
         <result property="memberPhone" column="m_phone"/>
         <result property="memberEmail" column="m_email"/>
-        <result property="memberAuthority" column="m_authority"/>
         <result property="memberRank" column="m_rank_no"/>
+        <result property="memberAuthority" column="m_authority"/>
         <result property="enterpriseNo" column="e_no"/>
     </resultMap>
     <!-- Create -->
@@ -53,8 +53,8 @@
         FROM
             member
         WHERE
-            m_id = #{inputMemberId}
+            m_id = #{memberId}
             AND
-            m_pw = #{inputMemberPw}
+            m_pw = #{memberPw}
     </select>
 </mapper>
