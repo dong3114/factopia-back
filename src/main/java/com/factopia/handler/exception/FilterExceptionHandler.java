@@ -13,11 +13,19 @@ import java.io.IOException;
 public class FilterExceptionHandler extends BaseExceptionHandler {
 
     /**
-     * 인증 실패 처리 (로그만 남기고 HTTP 응답 없음)
+     * 인증 실패 처리 (401 Unauthorized)
      */
     public void handleAuthenticationFailure(HttpServletResponse response, String message) throws IOException
     {
         createJsonErrorResponse(response, HttpStatus.UNAUTHORIZED, "인증 실패", message);
+    }
+
+    /**
+     * 존재하지 않는 API 요청 처리 (404 Not Found)
+     */
+    public void handleNotFoundException(HttpServletResponse response, String message) throws IOException
+    {
+        createJsonErrorResponse(response, HttpStatus.NOT_FOUND, "API 요청 오류", message);
     }
 
     /**

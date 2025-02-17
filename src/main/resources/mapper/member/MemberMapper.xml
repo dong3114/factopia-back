@@ -20,7 +20,8 @@
             SELECT CONCAT('M', LPAD(IFNULL(MAX(SUBSTRING(m_no, 2)), 0) + 1, 6, '0')) FROM member
         </selectKey>
         INSERT INTO member (m_no, m_id, m_pw, m_name, m_phone, m_email, m_authority, m_rank_no, e_no)
-        VALUES (#{memberNo}, #{memberId}, #{memberPw}, #{memberName}, #{memberPhone}, #{memberEmail}, NULL, NULL, NULL)
+        VALUES (#{memberNo}, #{memberId}, #{memberPw}, #{memberName}, #{memberPhone}, #{memberEmail},
+        1, NULL, NULL)
     </insert>
 
     <!-- 아이디 중복 검사 -->
