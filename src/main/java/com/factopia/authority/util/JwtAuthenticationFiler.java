@@ -12,19 +12,27 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class JwtAuthenticationFiler extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final FilterExceptionHandler filterExceptionHandler;
+    private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
-    public JwtAuthenticationFiler(JwtUtil jwtUtil, FilterExceptionHandler filterExceptionHandler){
+    public JwtAuthenticationFiler(JwtUtil jwtUtil,
+                                  FilterExceptionHandler filterExceptionHandler,
+                                  RequestMappingHandlerMapping requestMappingHandlerMapping){
         this.jwtUtil = jwtUtil;
         this.filterExceptionHandler = filterExceptionHandler;
+        this.requestMappingHandlerMapping = requestMappingHandlerMapping;
     }
 
     /**
@@ -51,6 +59,13 @@ public class JwtAuthenticationFiler extends OncePerRequestFilter {
             return;
         }
 
+        // ✅ 존재하지 않는 컨트롤러 요청을 404로 처리
+        if (!isExistingAPI(requestURI)) { // 존재하지 않는 API 요청
+            System.out.println("🚨 [JwtAuthenticationFilter] 존재하지 않는 API 요청 - 404 Not Found");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "API 경로가 존재하지 않습니다.");
+            return;
+        }
+
         String authorizationHeader = request.getHeader("Authorization");
         List<String> authWhiteList = SpringSecurityConfig.getAuthWhiteList();
 
@@ -59,12 +74,6 @@ public class JwtAuthenticationFiler extends OncePerRequestFilter {
             System.out.println("🛠 [JwtAuthenticationFilter] 인증 예외 경로 접근: " + requestURI);
             filterChain.doFilter(request, response);
             return;
-        }
-
-        if (authorizationHeader == null) {
-            System.out.println("🚨 [JwtAuthenticationFilter] 인증 실패 - Authorization 헤더 없음");
-        } else {
-            System.out.println("🔎 [JwtAuthenticationFilter] Authorization 헤더 확인: " + authorizationHeader);
         }
 
         // 🔹 헤더 검사
@@ -100,5 +109,21 @@ public class JwtAuthenticationFiler extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-
+    /**
+     * ✅ 존재하는 API인지 확인하는 메서드
+     * Spring MVC에 등록된 컨트롤러의 매핑 정보를 조회하여 확인
+     */
+    private boolean isExistingAPI(String requestURI) {
+        Map<RequestMappingInfo, HandlerMethod> handlerMethods = requestMappingHandlerMapping.getHandlerMethods();
+        for (RequestMappingInfo mappingInfo : handlerMethods.keySet()) {
+            if (mappingInfo.getPathPatternsCondition() != null) {
+                for (org.springframework.web.util.pattern.PathPattern pattern : mappingInfo.getPathPatternsCondition().getPatterns()) {
+                    if (requestURI.matches(pattern.getPatternString().replace("**", ".*"))) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }

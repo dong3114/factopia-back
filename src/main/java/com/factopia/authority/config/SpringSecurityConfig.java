@@ -1,6 +1,7 @@
 package com.factopia.authority.config;
 
 import com.factopia.authority.util.JwtAuthenticationFiler;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,7 +11,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +32,6 @@ public class SpringSecurityConfig {
             "/actuator/info",
             "/api/auth/**",
             "/api/member/register/**",
-            "/api/factory/**",
             "/api/member/login"
     );
 
@@ -47,6 +46,11 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(AUTH_WHITELIST.toArray(new String[0])).permitAll() // 🔹 배열로 변환 후 적용
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_NOT_FOUND, "요청하신 API가 존재하지 않습니다.");
+                        })
                 )
                 .addFilterBefore(jwtAuthenticationFiler, UsernamePasswordAuthenticationFilter.class);
 
