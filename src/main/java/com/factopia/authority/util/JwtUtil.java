@@ -2,29 +2,32 @@ package com.factopia.authority.util;
 
 import com.factopia.authority.domain.JwtToken;
 import com.factopia.dbenum.Role;
+import com.factopia.member.domain.Member;
+import com.factopia.member.mapper.MemberMapper;
 import io.jsonwebtoken.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@RequiredArgsConstructor
 @Component
 public class JwtUtil {
-
-    private final JwtToken jwtToken;
-
     @Autowired
-    public JwtUtil(JwtToken jwtToken) {
-        this.jwtToken = jwtToken;
-    }
+    private final JwtToken jwtToken;
+    private final MemberMapper memberMapper;
 
     /**
      * 토큰 발급 정보
      * @param memberNo 회원코드
-     * @param role 열거형 권한 정보
+     * role 열거형 권한 정보
      * @return
      */
-    public String generateToken(String memberNo, Role role, String enterpriseNo){
+    public String generateToken(String memberNo){
+        Member memberInfo = memberMapper.getMemberInfo(memberNo);
+        String enterpriseNo = memberInfo.getEnterpriseNo();
+        Role role = Role.fromLevel(memberInfo.getMemberAuthority());
         return Jwts.builder()
                 .setSubject(memberNo)
                 .claim("e_no", enterpriseNo)
@@ -43,12 +46,8 @@ public class JwtUtil {
         if(!validateToken(oldToken)) {
             throw new RuntimeException("토큰이 유효하지 않습니다.");
         }
-
         String memberNo = extractMemberNo(oldToken);
-        String enterpriseNo = extractEnterpriseNo(oldToken);
-        Role role = extractLevel(oldToken);
-
-        return generateToken(memberNo, role, enterpriseNo);
+        return generateToken(memberNo);
     }
 
     /**

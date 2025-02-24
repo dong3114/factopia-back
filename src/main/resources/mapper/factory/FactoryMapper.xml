@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.factopia.factory.domain.FactorySite">
     <resultMap id="FactorySiteResultMap" type="com.factopia.factory.domain.FactorySite">
-        <id     property="factoryNo" column="f_no"/>
+        <id property="factoryNo" column="f_no"/>
         <result property="enterpriseNo" column="e_no"/>
         <result property="totalWidth" column="total_width"/>
         <result property="totalHeight" column="total_height"/>
@@ -12,7 +12,89 @@
         <result property="createTime" column="created_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="factorySiteName" column="factory_site_name"/>
+
+        <!-- 공장 구역 정보 (1:N) -->
+        <collection property="factoryZones" javaType="ArrayList" ofType="com.factopia.factory.domain.FactoryZone">
+            <id property="factoryZoneNo" column="f_zone_no"/>
+            <result property="xStart" column="fz_x_start"/>
+            <result property="yStart" column="fz_y_start"/>
+            <result property="zStart" column="fz_z_start"/>
+            <result property="xEnd" column="fz_x_end"/>
+            <result property="yEnd" column="fz_y_end"/>
+            <result property="zEnd" column="fz_z_end"/>
+            <result property="zoneDescription" column="zone_discription"/>
+            <result property="createTime" column="fz_created_time"/>
+            <result property="updateTime" column="fz_update_time"/>
+
+            <!-- 공장 사용 구역 정보 (1:N) -->
+            <collection property="factorySections" javaType="ArrayList" ofType="com.factopia.factory.domain.FactorySection">
+                <id property="factorySectionNo" column="f_section_no"/>
+                <result property="xStart" column="fsn_x_start"/>
+                <result property="yStart" column="fsn_y_start"/>
+                <result property="zStart" column="fsn_z_start"/>
+                <result property="xEnd" column="fsn_x_end"/>
+                <result property="yEnd" column="fsn_y_end"/>
+                <result property="zEnd" column="fsn_z_end"/>
+                <result property="usedDescription" column="used_discription"/>
+                <result property="createTime" column="fsn_created_time"/>
+                <result property="updateTime" column="fsn_update_time"/>
+
+                <!-- 3D 오브젝트 정보 (1:N) -->
+                <collection property="objects" javaType="ArrayList" ofType="com.factopia.factory.domain.Object3D">
+                    <id property="objectNo" column="object_no"/>
+                    <result property="xPosition" column="x_pos"/>
+                    <result property="yPosition" column="y_pos"/>
+                    <result property="zPosition" column="z_pos"/>
+                    <result property="xSize" column="x_size"/>
+                    <result property="ySize" column="y_size"/>
+                    <result property="zSize" column="z_size"/>
+                    <result property="color" column="color"/>
+                    <result property="classification" column="classification"/>
+                    <result property="geometryData" column="geometry"/>
+                    <result property="materialData" column="material"/>
+                    <result property="rotationX" column="rotation_x"/>
+                    <result property="rotationY" column="rotation_y"/>
+                    <result property="rotationZ" column="rotation_z"/>
+                    <result property="createTime" column="obj_created_time"/>
+                    <result property="updateTime" column="obj_update_time"/>
+                </collection>
+            </collection>
+        </collection>
     </resultMap>
-    
+
+    <!-- 기업이 가진 전체공장 조회 -->
+    <select id="getAllFactoryNo" parameterType="String" resultType="String">
+        SELECT f_no
+        FROM factory_site
+        WHERE e_no = #{enterpriseNo};
+    </select>
+
+    <!-- ✅ 공장 전체 데이터 조회 (Factory Site + Factory Zone + Factory Section + Object3D) -->
+    <select id="getFactoryAllData" parameterType="String" resultMap="FactorySiteResultMap">
+        SELECT
+        fs.f_no, fs.e_no, fs.total_width, fs.total_height, fs.total_depth,
+        fs.created_time, fs.update_time, fs.factory_site_name,
+
+        fz.f_zone_no, fz.x_start AS fz_x_start, fz.y_start AS fz_y_start, fz.z_start AS fz_z_start,
+        fz.x_end AS fz_x_end, fz.y_end AS fz_y_end, fz.z_end AS fz_z_end, fz.zone_discription, fz.created_time AS fz_created_time, fz.update_time AS fz_update_time,
+
+        fsn.f_section_no, fsn.x_start AS fsn_x_start, fsn.y_start AS fsn_y_start, fsn.z_start AS fsn_z_start,
+        fsn.x_end AS fsn_x_end, fsn.y_end AS fsn_y_end, fsn.z_end AS fsn_z_end, fsn.used_discription, fsn.created_time AS fsn_created_time, fsn.update_time AS fsn_update_time,
+
+        obj.object_no, obj.f_section_no AS obj_section_no, obj.x_pos, obj.y_pos, obj.z_pos,
+        obj.x_size, obj.y_size, obj.z_size, obj.color, obj.classification,
+        obj.geometry, obj.material, obj.rotation_x, obj.rotation_y, obj.rotation_z, obj.created_time AS obj_created_time, obj.update_time AS obj_update_time
+
+        FROM factory_site fs
+        LEFT JOIN factory_zone fz ON fs.f_no = fz.f_no
+        LEFT JOIN factory_section fsn ON fz.f_zone_no = fsn.f_zone_no
+        LEFT JOIN object_3D obj ON fsn.f_section_no = obj.f_section_no
+        WHERE fs.f_no = #{factoryNo}
+    </select>
+
+
+
+
+
 </mapper>
     

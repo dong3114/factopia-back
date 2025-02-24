@@ -58,4 +58,22 @@
             AND
             m_pw = #{memberPw}
     </select>
+
+    <!-- 회원정보 -->
+    <select id="getMemberInfo" resultMap="MemberResultMap">
+        SELECT
+        m_no,
+        m_id,
+        m_pw,
+        m_name,
+        m_phone,
+        m_email,
+        m_authority,
+        m_rank_no,
+        e_no
+        FROM
+        member
+        WHERE
+        m_no = #{memberNo}
+    </select>
 </mapper>
