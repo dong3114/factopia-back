@@ -53,11 +53,10 @@ public class MemberServiceImpl implements MemberService{
         }
 
         String memberNo = member.getMemberNo();
-        Role role = Role.fromLevel(member.getMemberRank());
         String enterpriseNo = member.getEnterpriseNo();
         long expires = System.currentTimeMillis() + jwtUtil.getExpirationTime();
 
-        String token = jwtUtil.generateToken(memberNo, role, enterpriseNo);
+        String token = jwtUtil.generateToken(memberNo);
 
         return new GenerateJwtToken(token, memberNo, enterpriseNo, expires);
     }

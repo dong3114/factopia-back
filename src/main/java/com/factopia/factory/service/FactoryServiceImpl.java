@@ -19,6 +19,16 @@ public class FactoryServiceImpl implements FactoryService{
     @Autowired
     private final FactoryMapper factoryMapper;
 
+    public List<String> getAllFactoryNo(String enterpriseNo){
+        List<String> factorise = factoryMapper.getAllFactoryNo(enterpriseNo);
+        if(factorise.isEmpty()){
+            System.out.println("기업내부에 공장이 없습니다.");
+            return List.of(); // 빈 리스트 반환 null 방지
+        }
+        return factorise;
+    }
+
+
     /**
      * 썸네일 포함 공장 객체 반환
      */

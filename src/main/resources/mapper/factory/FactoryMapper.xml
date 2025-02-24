@@ -62,6 +62,12 @@
         </collection>
     </resultMap>
 
+    <!-- 기업이 가진 전체공장 조회 -->
+    <select id="getAllFactoryNo" parameterType="String" resultType="String">
+        SELECT f_no
+        FROM factory_site
+        WHERE e_no = #{enterpriseNo};
+    </select>
 
     <!-- ✅ 공장 전체 데이터 조회 (Factory Site + Factory Zone + Factory Section + Object3D) -->
     <select id="getFactoryAllData" parameterType="String" resultMap="FactorySiteResultMap">
@@ -85,6 +91,7 @@
         LEFT JOIN object_3D obj ON fsn.f_section_no = obj.f_section_no
         WHERE fs.f_no = #{factoryNo}
     </select>
+
 
 
 
