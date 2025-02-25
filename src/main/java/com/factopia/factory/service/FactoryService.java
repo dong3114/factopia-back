@@ -5,6 +5,6 @@ import com.factopia.factory.domain.FactoryDataResponse;
 import java.util.List;
 
 public interface FactoryService {
-    FactoryDataResponse factoryAllData(String factoryNo);
+    List<FactoryDataResponse> factoryAllData(List<String> factoryNos);
     List<String> getAllFactoryNo(String enterpriseNo);
 }

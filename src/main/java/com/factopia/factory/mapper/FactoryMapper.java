@@ -8,6 +8,6 @@ import java.util.List;
 
 @Mapper
 public interface FactoryMapper {
-    FactoryDataResponse getFactoryAllData(@Param("factoryNo")String factoryNo);
+    List<FactoryDataResponse> getFactoryAllData(@Param("factoryNo")List<String> factoryNos);
     List<String> getAllFactoryNo(@Param("enterpriseNo")String enterpriseNo);
 }

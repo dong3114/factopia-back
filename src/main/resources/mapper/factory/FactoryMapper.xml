@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.factopia.factory.domain.FactorySite">
+<mapper namespace="com.factopia.factory.mapper.FactoryMapper">
     <resultMap id="FactorySiteResultMap" type="com.factopia.factory.domain.FactorySite">
         <id property="factoryNo" column="f_no"/>
         <result property="enterpriseNo" column="e_no"/>
@@ -70,7 +70,7 @@
     </select>
 
     <!-- ✅ 공장 전체 데이터 조회 (Factory Site + Factory Zone + Factory Section + Object3D) -->
-    <select id="getFactoryAllData" parameterType="String" resultMap="FactorySiteResultMap">
+    <select id="getFactoryAllData" parameterType="java.util.List" resultMap="FactorySiteResultMap">
         SELECT
         fs.f_no, fs.e_no, fs.total_width, fs.total_height, fs.total_depth,
         fs.created_time, fs.update_time, fs.factory_site_name,
@@ -89,7 +89,10 @@
         LEFT JOIN factory_zone fz ON fs.f_no = fz.f_no
         LEFT JOIN factory_section fsn ON fz.f_zone_no = fsn.f_zone_no
         LEFT JOIN object_3D obj ON fsn.f_section_no = obj.f_section_no
-        WHERE fs.f_no = #{factoryNo}
+        WHERE fs.f_no = IN
+        <foreach item="factoryNo" collection="list" open="(" separator="," close=")" >
+            #{factoryNo}
+        </foreach>
     </select>
 
 
