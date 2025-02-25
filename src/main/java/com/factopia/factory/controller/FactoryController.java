@@ -1,9 +1,8 @@
 package com.factopia.factory.controller;
 
 import com.factopia.authority.util.JwtUtil;
+import com.factopia.factory.domain.FactoryDataResponse;
 import com.factopia.factory.service.FactoryService;
-import com.factopia.handler.exception.ApiExceptionHandler;
-import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +17,11 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/fatories")
+@RequestMapping("/api/factories")
 public class FactoryController {
     @Autowired
-    JwtUtil jwtUtil;
-    FactoryService factoryService;
+    private final JwtUtil jwtUtil;
+    private final FactoryService factoryService;
 
     @GetMapping("/")
     public ResponseEntity<Map<String, Object>> factoryAllData(
@@ -32,18 +31,19 @@ public class FactoryController {
         }
 
         String enterpriseNo = jwtUtil.extractEnterpriseNo(token);
-        List<String> factorise = factoryService.getAllFactoryNo(enterpriseNo);
+        List<String> factoryNos = factoryService.getAllFactoryNo(enterpriseNo);
 
         // 응답 객체
         Map<String, Object> response = new HashMap<>();
-
-        if(factorise.isEmpty()){
+        if(factoryNos.isEmpty()){
             response.put("message", "등록된 공장이 없습니다.");
             response.put("factorise", List.of());
             return ResponseEntity.ok(response);
         }
+        List<FactoryDataResponse> factories = factoryService.factoryAllData(factoryNos);
+
         response.put("message", "공장 조회 성공");
-        response.put("factorise", factorise);
+        response.put("factorise", factories);
 
         return ResponseEntity.ok(response);
     }
