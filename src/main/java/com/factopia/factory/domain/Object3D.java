@@ -9,30 +9,26 @@ import java.sql.Timestamp;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class Object3D {
-    private String objectNo; // 오브젝트 ID (PK)
-    private String sectionNo; // 공장 사용구역 ID (FK)
+    private String objectNo;   // object_no (PK)
+    private String factorySectionNo;  // f_section_no (FK)
 
-    private Double xPosition; // X축 위치
-    private Double yPosition; // Y축 위치
-    private Double zPosition; // Z축 위치
+    private Double xPosition; // x_pos
+    private Double yPosition; // y_pos
+    private Double zPosition; // z_pos
 
-    private Double xSize; // X축 크기
-    private Double ySize; // Y축 크기
-    private Double zSize; // Z축 크기
+    private Double xSize; // x_size
+    private Double ySize; // y_size
+    private Double zSize; // z_size
 
-    private String color; // 색상
+    private String color; // color
+    private String classification; // classification
+    private String geometryData; // geometry
+    private String materialData; // material
 
-    @Builder.Default
-    private Timestamp createTime = new Timestamp(System.currentTimeMillis());
+    private Double rotationX; // rotation_x
+    private Double rotationY; // rotation_y
+    private Double rotationZ; // rotation_z
 
-    @Builder.Default
-    private Timestamp updateTime = null;
-
-    private String classification; // 분류
-    private String geometry; // 기하학 데이터 (JSON)
-    private String material; // 재질 정보 (JSON)
-
-    private Double rotationX; // X축 회전
-    private Double rotationY; // Y축 회전
-    private Double rotationZ; // Z축 회전
+    private Timestamp createTime; // create_time
+    private Timestamp updateTime; // update_time
 }

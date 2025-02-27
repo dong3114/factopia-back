@@ -6,28 +6,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class FactoryZone {
-    private String factoryZoneNo; // 공장구역 ID (PK)
-    private String factoryNo; // 공장부지 ID (FK)
+    private String factoryZoneNo; // f_zone_no (PK)
+    private String factoryNo;     // f_no (FK)
 
-    private double xStart; // X축 시작 좌표
-    private double yStart; // Y축 시작 좌표
-    private double zStart; // Z축 시작 좌표
+    private double xStart; // x_start
+    private double yStart; // y_start
+    private double zStart; // z_start
+    private double xEnd;   // x_end
+    private double yEnd;   // y_end
+    private double zEnd;   // z_end
 
-    private double xEnd; // X축 끝 좌표
-    private double yEnd; // Y축 끝 좌표
-    private double zEnd; // Z축 끝 좌표
+    private String zoneDescription; // zone_discription
 
-    private String zoneDescription; // 구역 설명
+    private Timestamp createTime;   // created_time
+    private Timestamp updateTime;   // update_time
 
-    @Builder.Default
-    private Timestamp createTime = new Timestamp(System.currentTimeMillis());
-
-    @Builder.Default
-    private Timestamp updateTime = null;
+    private List<FactorySection> factorySections; // 공장 사용 구역 정보 (1:N)
 }

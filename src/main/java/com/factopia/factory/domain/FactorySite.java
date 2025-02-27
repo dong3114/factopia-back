@@ -3,25 +3,24 @@ package com.factopia.factory.domain;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // 빌더사용강제
 @Builder
 public class FactorySite {
-    // 공장부지
-    private String factoryNo; // 공장부지코드
-    private String enterpriseNo; // 기업코드
+    private String factoryNo;       // f_no (PK)
+    private String enterpriseNo;    // e_no (FK)
 
-    private Double totalWidth; // 공장전체 'x축'
-    private Double totalHeight; // 공장전체 'y축'
-    private Double totalDepth; // 공장전체 'z축'
+    private Double totalWidth;      // total_width
+    private Double totalHeight;     // total_height
+    private Double totalDepth;      // total_depth
 
-    @Builder.Default
-    private Timestamp createTime = new Timestamp(System.currentTimeMillis()); // 현재 시간을 기본값으로 한다.
+    private Timestamp createTime;   // created_time
+    private Timestamp updateTime;   // update_time
 
-    @Builder.Default
-    private Timestamp updateTime = null; // 수정 시간은 기본값 null
+    private String factorySiteName; // factory_site_name
 
-    private String factorySiteName; // 공장부지 이름
+    private List<FactoryZone> factoryZones;  // 공장 구역 정보 (1:N)
 }
