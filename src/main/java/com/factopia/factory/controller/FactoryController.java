@@ -31,16 +31,16 @@ public class FactoryController {
         }
 
         String enterpriseNo = jwtUtil.extractEnterpriseNo(token);
-        List<String> factoryNos = factoryService.getAllFactoryNo(enterpriseNo);
+        List<FactoryDataResponse> factories = factoryService.factoryAllData(enterpriseNo);
+        System.out.println("공장" + factories);
 
         // 응답 객체
         Map<String, Object> response = new HashMap<>();
-        if(factoryNos.isEmpty()){
+        if(factories.isEmpty()){
             response.put("message", "등록된 공장이 없습니다.");
             response.put("factorise", List.of());
             return ResponseEntity.ok(response);
         }
-        List<FactoryDataResponse> factories = factoryService.factoryAllData(factoryNos);
 
         response.put("message", "공장 조회 성공");
         response.put("factorise", factories);
