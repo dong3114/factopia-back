@@ -17,4 +17,7 @@ public interface FactoryMapper {
     List<FactoryZone> factoryZonesLoad(@Param("factoryNo") String factoryNo);
     List<FactorySection> factorySectionsLoad(@Param("factoryZoneNo") String factoryZoneNo);
     List<Object3D> object3DsLoad(@Param("factorySectionNo") String factorySectionNo);
+
+    List<FactorySite> getFactoryAllData(@Param("enterpriseNo") String enterpriseNo);
+
 }

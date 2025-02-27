@@ -29,6 +29,6 @@ public class Object3D {
     private Double rotationY; // rotation_y
     private Double rotationZ; // rotation_z
 
-    private Timestamp createTime; // create_time
-    private Timestamp updateTime; // update_time
+    private Timestamp oCreateTime; // create_time
+    private Timestamp oUpdateTime; // update_time
 }

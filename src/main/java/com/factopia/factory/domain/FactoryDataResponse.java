@@ -12,9 +12,6 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class FactoryDataResponse {
-    private FactorySite factorySite;
-    private List<FactoryZone> factoryZones;
-    private List<FactorySection> factorySections;
-    private List<Object3D> object3DS;
-    private byte[] thumbnail;
+    private List<FactorySite> factorySites;
+    private List<byte[]> thumbnails;
 }

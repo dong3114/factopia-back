@@ -30,51 +30,40 @@ public class FactoryServiceImpl implements FactoryService{
     /**
      * 썸네일 포함 공장 객체 반환
      */
-    @Transactional
-    public List<FactoryDataResponse> factoryAllData(String enterpriseNo){
-        // 1. 기업 코드를 통해 공장부지 로드
-        List<FactorySite> factorySites = factoryMapper.factorySitesLoad(enterpriseNo);
-        // null 방지용 빈객체 반환
-        if (factorySites.isEmpty()){
-            return List.of();
-        }
-        // 2. 병렬 처리하여 하위 계층 데이터 로드
-        return factorySites.parallelStream().map(factorySite -> {
-            String factoryNo = factorySite.getFactoryNo();
-            List<FactoryZone> factoryZones = factoryMapper.factoryZonesLoad(factoryNo);
-            // zone 리스트화
-            factoryZones.forEach(zone -> {
-                List<FactorySection> factorySections = factoryMapper.factorySectionsLoad(zone.getFactoryZoneNo());
-                // section 리스트화
-                factorySections.forEach(section -> {
-                    // object 3D 데이터 로드
-                    List<Object3D> object3Ds = factoryMapper.object3DsLoad(section.getFactorySectionNo());
-                    section.setObject3DS(object3Ds);
-                });
-                zone.setFactorySections(factorySections);
-            });
-            factorySite.setFactoryZones(factoryZones);
-            return FactoryDataResponse.builder()
-                    .factorySite(factorySite)
-                    .factoryZones(factoryZones)
-                    .factorySections(factoryZones.stream()
-                            .flatMap(zone -> zone.getFactorySections().stream())
-                            .collect(Collectors.toList()))
-                    .object3DS(extractObjects(factoryZones))
-                    .thumbnail(ThumbnailUtil.generateThumbnail(factorySite, extractObjects(factoryZones)))
-                    .build();
-        }).collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public FactoryDataResponse factoryAllData(String enterpriseNo) {
+        List<FactorySite> factorySites = factoryMapper.getFactoryAllData(enterpriseNo);
+        // 썸네일 객체 반환
+        List<byte[]> thumbnails = factorySites.stream()
+                .map(factorySite -> ThumbnailUtil.generateThumbnail(factorySite, extractObjects(factorySite.getFactoryZones())))
+                .collect(Collectors.toList());
+
+        return FactoryDataResponse.builder()
+                .factorySites(factorySites)
+                .thumbnails(thumbnails)
+                .build();
     }
 
-    // factoryZones를 순회하며 하위 계층의 object3DS만 추출
-    private List<Object3D> extractObjects(List<FactoryZone> zones) {
-        List<Object3D> objects = new ArrayList<>();
-        for (FactoryZone zone : zones) {
-            for (FactorySection section : zone.getFactorySections()) {
-                objects.addAll(section.getObject3DS());
-            }
-        }
-        return objects;
+    /**
+     * 특정 공장에 속한 모든 `FactorySection` 목록을 추출하는 메서드
+     */
+    private List<FactorySection> extractSections(List<FactoryZone> factoryZones) {
+        if (factoryZones == null) return List.of();
+        return factoryZones.stream()
+                .flatMap(zone -> zone.getFactorySections().stream())
+                .collect(Collectors.toList());
     }
+
+    /**
+     * 특정 공장에 속한 모든 `Object3D` 목록을 추출하는 메서드
+     */
+    private List<Object3D> extractObjects(List<FactoryZone> factoryZones) {
+        if (factoryZones == null) return List.of();
+        return factoryZones.stream()
+                .flatMap(zone -> zone.getFactorySections().stream())
+                .flatMap(section -> section.getObject3DS().stream())
+                .collect(Collectors.toList());
+    }
+
 
 }
