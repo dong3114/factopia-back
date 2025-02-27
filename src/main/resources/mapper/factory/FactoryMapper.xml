@@ -3,63 +3,58 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.factopia.factory.mapper.FactoryMapper">
-    <!-- 공장 반환객체 -->
+
+    <!-- ✅ FactoryDataResponse 반환 객체 -->
     <resultMap id="FactoryDataResponseMap" type="com.factopia.factory.domain.FactoryDataResponse">
-        <association property="factorySite" javaType="com.factopia.factory.domain.FactorySite" resultMap="FactorySiteResultMap"/>
+        <association property="factorySites" javaType="com.factopia.factory.domain.FactorySite" resultMap="FactorySiteResultMap"/>
     </resultMap>
 
-    <!-- 최상위 공장 사이트 결과 매핑 -->
+    <!-- ✅ 최상위 공장 사이트 결과 매핑 -->
     <resultMap id="FactorySiteResultMap" type="com.factopia.factory.domain.FactorySite">
         <id property="factoryNo" column="f_no"/>
         <result property="enterpriseNo" column="e_no"/>
         <result property="totalWidth" column="total_width"/>
         <result property="totalHeight" column="total_height"/>
         <result property="totalDepth" column="total_depth"/>
-        <result property="createTime" column="created_time"/>
-        <result property="updateTime" column="update_time"/>
+        <result property="fCreateTime" column="created_time"/>
+        <result property="fUpdateTime" column="update_time"/>
         <result property="factorySiteName" column="factory_site_name"/>
-        <!-- 공장 구역 정보를 nested select로 로드 -->
-        <collection property="factoryZones" ofType="com.factopia.factory.domain.FactoryZone"
-                    select="factoryZonesLoad" column="f_no"/>
+        <collection property="factoryZones" ofType="com.factopia.factory.domain.FactoryZone" resultMap="FactoryZoneResultMap"/>
     </resultMap>
 
-    <!-- 공장 구역 결과 매핑 -->
+    <!-- ✅ 공장 구역 결과 매핑 -->
     <resultMap id="FactoryZoneResultMap" type="com.factopia.factory.domain.FactoryZone">
         <id property="factoryZoneNo" column="f_zone_no"/>
         <result property="factoryNo" column="f_no"/>
-        <result property="xStart" column="fz_x_start"/>
-        <result property="yStart" column="fz_y_start"/>
-        <result property="zStart" column="fz_z_start"/>
-        <result property="xEnd" column="fz_x_end"/>
-        <result property="yEnd" column="fz_y_end"/>
-        <result property="zEnd" column="fz_z_end"/>
-        <result property="zoneDescription" column="zone_discription"/>
-        <result property="createTime" column="fz_created_time"/>
-        <result property="updateTime" column="fz_update_time"/>
-        <!-- 공장 사용 구역 정보를 nested select로 로드 -->
-        <collection property="factorySections" ofType="com.factopia.factory.domain.FactorySection"
-                    select="factorySectionsLoad" column="f_zone_no"/>
+        <result property="fzXStart" column="x_start"/>  <!-- SQL의 별칭을 사용 -->
+        <result property="fzYStart" column="y_start"/>
+        <result property="fzZStart" column="z_start"/>
+        <result property="fzXEnd" column="x_end"/>
+        <result property="fzYEnd" column="y_end"/>
+        <result property="fzZEnd" column="z_end"/>
+        <result property="zoneDescription" column="zone_description"/>
+        <result property="fzCreateTime" column="created_time"/>
+        <result property="fzUpdateTime" column="update_time"/>
+        <collection property="factorySections" ofType="com.factopia.factory.domain.FactorySection" resultMap="FactorySectionResultMap"/>
     </resultMap>
 
-    <!-- 공장 사용 구역 결과 매핑 -->
+    <!-- ✅ 공장 사용 구역 결과 매핑 -->
     <resultMap id="FactorySectionResultMap" type="com.factopia.factory.domain.FactorySection">
         <id property="factorySectionNo" column="f_section_no"/>
         <result property="factoryZoneNo" column="f_zone_no"/>
-        <result property="xStart" column="fsn_x_start"/>
-        <result property="yStart" column="fsn_y_start"/>
-        <result property="zStart" column="fsn_z_start"/>
-        <result property="xEnd" column="fsn_x_end"/>
-        <result property="yEnd" column="fsn_y_end"/>
-        <result property="zEnd" column="fsn_z_end"/>
-        <result property="usedDescription" column="used_discription"/>
-        <result property="createTime" column="fsn_created_time"/>
-        <result property="updateTime" column="fsn_update_time"/>
-        <!-- 3D 오브젝트 정보를 nested select로 로드 -->
-        <collection property="object3DS" ofType="com.factopia.factory.domain.Object3D"
-                    select="object3DsLoad" column="f_section_no"/>
+        <result property="fsXStart" column="x_start"/>  <!-- SQL의 별칭을 사용 -->
+        <result property="fsYStart" column="y_start"/>
+        <result property="fsZStart" column="z_start"/>
+        <result property="fsXEnd" column="x_end"/>
+        <result property="fsYEnd" column="y_end"/>
+        <result property="fsZEnd" column="z_end"/>
+        <result property="usedDescription" column="used_description"/>
+        <result property="fsCreateTime" column="created_time"/>
+        <result property="fsUpdateTime" column="update_time"/>
+        <collection property="object3DS" ofType="com.factopia.factory.domain.Object3D" resultMap="Object3DResultMap"/>
     </resultMap>
 
-    <!-- 3D 오브젝트 결과 매핑 -->
+    <!-- ✅ 3D 오브젝트 결과 매핑 -->
     <resultMap id="Object3DResultMap" type="com.factopia.factory.domain.Object3D">
         <id property="objectNo" column="object_no"/>
         <result property="factorySectionNo" column="f_section_no"/>
@@ -76,49 +71,46 @@
         <result property="rotationX" column="rotation_x"/>
         <result property="rotationY" column="rotation_y"/>
         <result property="rotationZ" column="rotation_z"/>
+        <result property="oCreateTime" column="created_time"/>
+        <result property="oUpdateTime" column="update_time"/>
     </resultMap>
+    <!-- ✅ 공장 전체 데이터 조회 -->
+    <select id="getFactoryAllData" parameterType="String" resultMap="FactorySiteResultMap">
+        SELECT
+        -- factory_site 테이블 컬럼
+        fs.f_no, fs.e_no, fs.total_width, fs.total_height, fs.total_depth,
+        fs.created_time, fs.update_time, fs.factory_site_name,
 
+        -- factory_zone 테이블 컬럼
+        fz.f_zone_no, fz.f_no,
+        fz.x_start, fz.y_start, fz.z_start,
+        fz.x_end, fz.y_end, fz.z_end,
+        fz.zone_description, fz.created_time, fz.update_time,
+
+        -- factory_section 테이블 컬럼
+        fsn.f_section_no, fsn.f_zone_no,
+        fsn.x_start, fsn.y_start, fsn.z_start,
+        fsn.x_end, fsn.y_end, fsn.z_end,
+        fsn.used_description, fsn.created_time, fsn.update_time,
+
+        -- object_3D 테이블 컬럼
+        obj.object_no, obj.f_section_no,
+        obj.x_pos, obj.y_pos, obj.z_pos,
+        obj.x_size, obj.y_size, obj.z_size,
+        obj.color, obj.classification, obj.geometry, obj.material,
+        obj.rotation_x, obj.rotation_y, obj.rotation_z,
+        obj.created_time, obj.update_time
+
+        FROM factory_site fs
+        LEFT JOIN factory_zone fz ON fs.f_no = fz.f_no
+        LEFT JOIN factory_section fsn ON fz.f_zone_no = fsn.f_zone_no
+        LEFT JOIN object_3D obj ON fsn.f_section_no = obj.f_section_no
+        WHERE fs.e_no = #{enterpriseNo}
+    </select>
     <!-- ✅ 기업이 가진 공장 코드 조회 -->
     <select id="getAllFactoryNo" parameterType="String" resultType="String">
         SELECT f_no
         FROM factory_site
         WHERE e_no = #{enterpriseNo}
-    </select>
-
-    <!-- ✅ 공장 정보 조회 -->
-    <select id="factorySitesLoad" parameterType="String" resultMap="FactorySiteResultMap">
-        SELECT
-        f_no, e_no, total_width, total_height, total_depth,
-        created_time, update_time, factory_site_name
-        FROM factory_site
-        WHERE e_no = #{enterpriseNo}
-    </select>
-
-    <!-- ✅ 특정 공장의 구역 정보 조회 -->
-    <select id="factoryZonesLoad" parameterType="String" resultMap="FactoryZoneResultMap">
-        SELECT
-        f_zone_no, f_no, x_start, y_start, z_start, x_end, y_end, z_end,
-        zone_discription, created_time, update_time
-        FROM factory_zone
-        WHERE f_no = #{factoryNo}
-    </select>
-
-    <!-- ✅ 특정 구역의 사용 구역 정보 조회 -->
-    <select id="factorySectionsLoad" parameterType="String" resultMap="FactorySectionResultMap">
-        SELECT
-        f_section_no, f_zone_no, x_start, y_start, z_start,
-        x_end, y_end, z_end, used_discription, created_time, update_time
-        FROM factory_section
-        WHERE f_zone_no = #{factoryZoneNo}
-    </select>
-
-    <!-- ✅ 특정 사용 구역의 3D 오브젝트 정보 조회 -->
-    <select id="object3DsLoad" parameterType="String" resultMap="Object3DResultMap">
-        SELECT
-        object_no, f_section_no, x_pos, y_pos, z_pos,
-        x_size, y_size, z_size, color, classification,
-        geometry, material, rotation_x, rotation_y, rotation_z
-        FROM object_3D
-        WHERE f_section_no = #{factorySectionNo}
     </select>
 </mapper>

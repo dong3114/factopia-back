@@ -17,8 +17,8 @@ public class FactorySite {
     private Double totalHeight;     // total_height
     private Double totalDepth;      // total_depth
 
-    private Timestamp createTime;   // created_time
-    private Timestamp updateTime;   // update_time
+    private Timestamp fCreateTime;   // created_time
+    private Timestamp fUpdateTime;   // update_time
 
     private String factorySiteName; // factory_site_name
 
