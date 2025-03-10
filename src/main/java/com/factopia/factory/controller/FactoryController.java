@@ -38,12 +38,12 @@ public class FactoryController {
         Map<String, Object> response = new HashMap<>();
         if(factories == null){
             response.put("message", "등록된 공장이 없습니다.");
-            response.put("factorise", List.of());
+            response.put("factories", List.of());
             return ResponseEntity.ok(response);
         }
 
         response.put("message", "공장 조회 성공");
-        response.put("factorise", factories);
+        response.put("factories", factories);
 
         return ResponseEntity.ok(response);
     }
